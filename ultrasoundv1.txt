@@ -1,0 +1,77 @@
+import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+import com.hopding.jrpicam.RPiCamera;
+import com.hopding.jrpicam.enums.Exposure;
+import com.hopding.jrpicam.exceptions.FailedToRunRaspistillException;
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPinDigitalInput;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import com.pi4j.io.gpio.PinPullResistance;
+import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
+import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import com.pi4j.wiringpi.SoftPwm;
+
+
+
+	public static double TestUltrasound() {
+			double distanceFromObstacle = 0.0;
+			//Set up the GPIO controller to be able to access the GPIO (General Purpose Input Output) Pins on the Pi.
+			GpioController gpio = GpioFactory.getInstance();
+			//Create digital versions of the pins so that you can access them, change their state and read changes in their state
+			//Echo
+			final GpioPinDigitalInput inputUltrasound = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06,PinPullResistance.PULL_DOWN);
+			//Trigger
+			final GpioPinDigitalOutput outputUltrasound = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_23); 
+			//Max distance will be implemented.
+			//int maxDistance = 23200;
+			double distanceToObstacle = 0.0;
+			//Times for the pulse to be used to calculate distance.
+			Instant pulseStart = null;
+			Instant pulseEnd = null;
+			long pulseDuration;
+
+			//Make sure the output pin is not turned on as it may mess up readings.
+			outputUltrasound.low();
+			//Uncomment prints for debugging
+			System.out.println("Setting up ultrasound sensor");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("Sensor set up");
+
+
+			System.out.println("Send pulse.");
+			//Send out pulse
+			outputUltrasound.high();
+			try {
+				Thread.sleep(0, 10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			outputUltrasound.low();
+			System.out.println("Waiting for response.");
+			//Wait until the pulse is back
+			while (inputUltrasound.isLow()){
+				pulseStart = Instant.now();
+			}
+			while (inputUltrasound.isHigh()) {
+				pulseEnd = Instant.now();
+			}
+			//Find out the time the pin was held high in microseconds
+			pulseDuration = ChronoUnit.MICROS.between(pulseStart, pulseEnd);
+			//Calculate the distance  in cm using the time difference. /58 comes from the official code for the sensor
+			distanceToObstacle = (pulseDuration)/58;
+			System.out.println("Distance from obstacle: " + distanceToObstacle + "cm");
+
+
+			return distanceFromObstacle;
+		}
+		

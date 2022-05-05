@@ -1,0 +1,16 @@
+private static void TestRightWheel() {
+		System.out.println("Testing the right wheel.");
+		
+		System.out.println("Backwards.");
+		TR.setWheelVelocities(0, -100, 2000); // 0 to disable a wheel
+		TR.setWheelVelocities(-100, -100, 2000);
+		System.out.println("Finished testing.");
+	}
+		
+		private static void TestLeftWheel() {
+		System.out.println("Testing the left wheel.");
+	
+		System.out.println("Backwards.");
+		TR.setWheelVelocities(-100, 0, 2000); // 0 to disable a wheel
+		System.out.println("Finished testing.");
+	}

@@ -1,5 +1,4 @@
 
-// in testing i got great accuracy
 
 public class Test_Ultrasonic{
 	public static void main(String[] args) throws Exception{
